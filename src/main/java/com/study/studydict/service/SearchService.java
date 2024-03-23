@@ -14,9 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+
 
 @Service
 public class SearchService {
@@ -67,7 +68,7 @@ public class SearchService {
                     return buildSearchdtoWithTagObj(info,tagList);
                 })
                 .collect(Collectors.toList());
-        ret_data.put("infoList",infoList);
+        ret_data.put("infoList",infoListDTO);
         ret_data.put("totalPage",infoList.getTotalPages());
         return new BaseReturnDTO("Success","",ret_data);
     }
@@ -84,7 +85,7 @@ public class SearchService {
         return new BaseReturnDTO("Success","");
     }
     public BaseReturnDTO saveInfo(InfoDTO infoDTO){ //글 추가수정
-        HashMap<String, InfoDTO> ret_data=new HashMap<String, InfoDTO>();
+        HashMap<String, InfoDTO> ret_data=new HashMap<>();
         String message="New";
         Info info=new Info();
         info.setId(infoDTO.id());
@@ -141,5 +142,6 @@ public class SearchService {
                 info.getCreatedDate()
         );
     }
+
 
 }
