@@ -2,6 +2,7 @@ package com.study.studydict.service;
 
 import com.study.studydict.dto.BaseReturnDTO;
 import com.study.studydict.dto.InfoDTO;
+import com.study.studydict.dto.QuizDTO;
 import com.study.studydict.model.Info;
 import com.study.studydict.model.InfoTagMap;
 import com.study.studydict.model.Tag;
@@ -33,11 +34,11 @@ public class SearchService {
     @Transactional(readOnly = true)
     public BaseReturnDTO getAllInfo(Pageable pageable){ //그냥 전부 검색
         HashMap<String,Object> ret_data=new HashMap<>();
-        Page<Info> infoList= infoRepository.findAll(pageable);
+        Page<Info> infoList= infoRepository.findAllByOrderByRecentUpdateDesc(pageable);
         List<InfoDTO> infoListDTO= infoList.stream()
                 .map(info->{
                     List<Tag> tagList= tagRepository.findByInfoId(info.getId());
-                    return buildSearchdtoWithTagObj(info,tagList);
+                    return new InfoDTO(info,tagList.stream().map(Tag::getTag).collect(Collectors.toList()));
                 })
                 .collect(Collectors.toList());
         ret_data.put("infoList",infoListDTO);
@@ -47,11 +48,11 @@ public class SearchService {
     @Transactional(readOnly = true)
     public BaseReturnDTO getByName(String name,Pageable pageable){ //이름 검색
         HashMap<String,Object> ret_data=new HashMap<>();
-        Page<Info> infoList= infoRepository.findByNameContainingIgnoreCase(name,pageable);
-        List<InfoDTO> infoListDTO= infoRepository.findByNameContainingIgnoreCase(name,pageable).stream()
+        Page<Info> infoList= infoRepository.findByNameContainingIgnoreCaseOrderByRecentUpdateDesc(name,pageable);
+        List<InfoDTO> infoListDTO= infoList.stream()
                 .map(info->{
                     List<Tag> tagList= tagRepository.findByInfoId(info.getId());
-                    return buildSearchdtoWithTagObj(info,tagList);
+                    return new InfoDTO(info,tagList.stream().map(Tag::getTag).collect(Collectors.toList()));
                 })
                 .collect(Collectors.toList());
         ret_data.put("infoList",infoListDTO);
@@ -61,11 +62,11 @@ public class SearchService {
     @Transactional(readOnly = true)
     public BaseReturnDTO getByTag(String tag,Pageable pageable){ //태그 검색
         HashMap<String,Object> ret_data=new HashMap<>();
-        Page<Info> infoList= infoRepository.findByTag(tag, pageable);
+        Page<Info> infoList= infoRepository.findByTagOrderByRecentUpdateDesc(tag, pageable);
         List<InfoDTO> infoListDTO= infoList.stream()
                 .map(info->{
                     List<Tag> tagList= tagRepository.findByInfoId(info.getId());
-                    return buildSearchdtoWithTagObj(info,tagList);
+                    return new InfoDTO(info,tagList.stream().map(Tag::getTag).collect(Collectors.toList()));
                 })
                 .collect(Collectors.toList());
         ret_data.put("infoList",infoListDTO);
@@ -94,7 +95,7 @@ public class SearchService {
         info.setDetailInfo(infoDTO.detailInfo());
 
         if(infoRepository.findByNameIgnoreCase(info.getName())!=null){ //중복체크
-            if(info.getId().equals(Long.valueOf(-1))) {
+            if(info.getId().equals((long) -1)) {
                 return new BaseReturnDTO("Fail", "Data Already Exist");
             }else{
                 message="Update";
@@ -116,32 +117,16 @@ public class SearchService {
             infoTagMap.setTag(existTag);
             infoTagMapRepository.save(infoTagMap);
         }
-        ret_data.put("info",buildSearchdtoWithTagString(info, infoDTO.tag()));
+        ret_data.put("info",new InfoDTO(info, infoDTO.tag()));
         return new BaseReturnDTO("Success",message,ret_data);
     }
-
-    private InfoDTO buildSearchdtoWithTagObj(Info info, List<Tag> tagList){
-        return new InfoDTO(
-                info.getId(),
-                info.getName(),
-                info.getSimpleInfo(),
-                info.getDetailInfo(),
-                tagList.stream().map(Tag::getTag).collect(Collectors.toList()),
-                info.getRecentUpdate(),
-                info.getCreatedDate()
-        );
+    public BaseReturnDTO test(){
+        HashMap<String, List<QuizDTO>> ret_data=new HashMap<>();
+        ret_data.put("QuizList",
+                infoRepository.findRandomRecords(3).stream()
+                        .map(info -> new QuizDTO(info)
+                        ).collect(Collectors.toList()));
+        return new BaseReturnDTO("Success","",ret_data);
     }
-    private InfoDTO buildSearchdtoWithTagString(Info info, List<String> tagList){
-        return new InfoDTO(
-                info.getId(),
-                info.getName(),
-                info.getSimpleInfo(),
-                info.getDetailInfo(),
-                tagList,
-                info.getRecentUpdate(),
-                info.getCreatedDate()
-        );
-    }
-
 
 }

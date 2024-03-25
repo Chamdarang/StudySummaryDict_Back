@@ -37,13 +37,17 @@ public class SearchController {
     public BaseReturnDTO delInfo(@RequestBody InfoDTO infoDTO) {
         return infoService.deleteInfo(infoDTO);
     }
-
+    @GetMapping(path = "/r")
+    public BaseReturnDTO randQuiz() {
+        return infoService.test();
+    }
+    @GetMapping(path = "/test")
+    public String gettest() {
+        return "testWJS";
+    }
     @PostMapping(path = "/test")
     public String posttest() {
         return "test";
     }
-    @GetMapping(path = "/test")
-    public String gettest() {
-        return "test";
-    }
+
 }
