@@ -91,7 +91,7 @@ public class SearchService {
         info.setSimpleInfo(infoDTO.simpleInfo());
         info.setDetailInfo(infoDTO.detailInfo());
 
-        if(infoRepository.findByNameIgnoreCase(info.getName())!=null){ //중복체크
+        if(infoDTO.id()!=-1 || infoRepository.findByNameIgnoreCase(info.getName())!=null){ //중복체크
             if(info.getId().equals((long) -1)) {
                 return new BaseReturnDTO("Fail", "Data Already Exist");
             }else{
@@ -119,8 +119,8 @@ public class SearchService {
     }
     public BaseReturnDTO randQuiz(){
         HashMap<String, Object> ret_data=new HashMap<>();
-        ret_data.put("QuizList",
-                infoRepository.findRandomRecords(3).stream()
+        ret_data.put("quizList",
+                infoRepository.findRandomRecords(5).stream()
                         .map(QuizDTO::new).collect(Collectors.toList()));
         return new BaseReturnDTO("Success","",ret_data);
     }

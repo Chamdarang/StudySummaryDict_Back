@@ -5,6 +5,7 @@ import com.study.studydict.model.Info;
 public record QuizDTO(
         String name,
         String simpleInfo,
+        String userAnswer,
         int correct
 
 
@@ -13,7 +14,9 @@ public record QuizDTO(
     public QuizDTO(Info info){
         this(
                 info.getName(),
+
                 info.getSimpleInfo(),
+                "",
                 0
         );
     }
