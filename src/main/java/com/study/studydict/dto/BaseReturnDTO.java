@@ -4,10 +4,10 @@ import java.util.HashMap;
 public record BaseReturnDTO(
         String status,
         String message,
-        HashMap data
+        HashMap<String,Object> data
 ) {
 
     public BaseReturnDTO(String status,String message){
-        this(status,message,new HashMap<String,String>());
+        this(status,message,null);
     }
 }

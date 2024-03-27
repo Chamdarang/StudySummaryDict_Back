@@ -28,4 +28,5 @@ public record InfoDTO(
                 info.getCreatedDate()
         );
     }
+
 }

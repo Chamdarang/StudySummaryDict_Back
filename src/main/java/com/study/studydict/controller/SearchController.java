@@ -7,46 +7,45 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+
 @RestController
 public class SearchController {
-    private final SearchService infoService;
+    private final SearchService searchService;
     @Autowired
-    public SearchController(SearchService infoService){
-        this.infoService=infoService;
+    public SearchController(SearchService searchService){
+        this.searchService=searchService;
     }
-    @GetMapping(path = "/s")
+    @GetMapping(path = "/i/s")
     public BaseReturnDTO searchInfo(@RequestParam String query,@RequestParam int page,@RequestParam int size) {
         Pageable pageable= PageRequest.of(page,size);
         BaseReturnDTO infoList;
         if(query==null || query.isBlank()) {
-            infoList = infoService.getAllInfo(pageable);
+            infoList = searchService.getAllInfo(pageable);
         }else{
             if(query.charAt(0)=='#') {
-                infoList = infoService.getByTag(query.substring(1),pageable);
+                infoList = searchService.getByTag(query.substring(1),pageable);
             }else{
-                infoList = infoService.getByName(query,pageable);
+                infoList = searchService.getByName(query,pageable);
             }
         }
         return infoList;
     }
-    @PostMapping(path = "/a")
+    @PostMapping(path = "/i/a")
     public BaseReturnDTO addInfo(@RequestBody InfoDTO infoDTO) {
-        return infoService.saveInfo(infoDTO);
+        return searchService.saveInfo(infoDTO);
     }
-    @PostMapping(path = "/d")
+    @PostMapping(path = "/i/d")
     public BaseReturnDTO delInfo(@RequestBody InfoDTO infoDTO) {
-        return infoService.deleteInfo(infoDTO);
+        return searchService.deleteInfo(infoDTO);
     }
-    @GetMapping(path = "/r")
+    @GetMapping(path = "/i/r")
     public BaseReturnDTO randQuiz() {
-        return infoService.test();
+        return searchService.randQuiz();
     }
-    @GetMapping(path = "/test")
-    public String gettest() {
-        return "testWJS";
-    }
-    @PostMapping(path = "/test")
-    public String posttest() {
+
+    @GetMapping(path = "/i/test")
+    public String itest() {
         return "test";
     }
 

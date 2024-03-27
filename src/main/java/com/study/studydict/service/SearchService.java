@@ -73,9 +73,6 @@ public class SearchService {
         ret_data.put("totalPage",infoList.getTotalPages());
         return new BaseReturnDTO("Success","",ret_data);
     }
-    public Info getById(long id){
-        return infoRepository.findById(id).orElse(null);
-    }//상세페이지 만들때까지 안씀
 
     public BaseReturnDTO deleteInfo(InfoDTO infoDTO){ //글 삭제
         Info info=new Info();
@@ -86,7 +83,7 @@ public class SearchService {
         return new BaseReturnDTO("Success","");
     }
     public BaseReturnDTO saveInfo(InfoDTO infoDTO){ //글 추가수정
-        HashMap<String, InfoDTO> ret_data=new HashMap<>();
+        HashMap<String, Object> ret_data=new HashMap<>();
         String message="New";
         Info info=new Info();
         info.setId(infoDTO.id());
@@ -120,13 +117,13 @@ public class SearchService {
         ret_data.put("info",new InfoDTO(info, infoDTO.tag()));
         return new BaseReturnDTO("Success",message,ret_data);
     }
-    public BaseReturnDTO test(){
-        HashMap<String, List<QuizDTO>> ret_data=new HashMap<>();
+    public BaseReturnDTO randQuiz(){
+        HashMap<String, Object> ret_data=new HashMap<>();
         ret_data.put("QuizList",
                 infoRepository.findRandomRecords(3).stream()
-                        .map(info -> new QuizDTO(info)
-                        ).collect(Collectors.toList()));
+                        .map(QuizDTO::new).collect(Collectors.toList()));
         return new BaseReturnDTO("Success","",ret_data);
     }
+
 
 }
