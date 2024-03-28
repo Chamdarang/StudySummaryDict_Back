@@ -89,10 +89,15 @@ public class DocService {
 
     private String makeMarkDown(String contents){
 
-        Matcher matcher= Pattern.compile("\\n\\[\\[([\\w가-힣]+[\\w가-힣 ]*)\\]\\]\\n").matcher(contents);
+        Matcher matcher= Pattern.compile("[\\n]?\\[\\[([\\w가-힣]+[\\w가-힣 ]*)\\]\\]\\n").matcher(contents);
         while (matcher.find()){
             String tgt=matcher.group(1);
-            contents=contents.replace("\n[["+tgt+"]]\n",makeMDofInfo(tgt));
+            if (contents.contains("\n[[" + tgt + "]]\n")){
+                contents=contents.replace("\n[["+tgt+"]]\n",makeMDofInfo(tgt));
+            }else{
+                contents=contents.replace("[["+tgt+"]]\n",makeMDofInfo(tgt));
+            }
+
         }
         return contents;
     }
@@ -104,6 +109,6 @@ public class DocService {
             info.setName(name);
             info.setSimpleInfo("-");
         }
-        return "<div className=\"mb-2 border\" key="+info.getId()+"><div className=\"fw-bold\">"+info.getName()+"</div><div>"+info.getSimpleInfo()+"</div></div>";
+        return "<div className=\"m-2 rounded-0 border\" key="+info.getId()+"><div className=\"fs-4 fw-bold mb-1\">"+info.getName()+"</div><div className=\"text-pre\">"+info.getSimpleInfo()+"</div></div>";
     }
 }
