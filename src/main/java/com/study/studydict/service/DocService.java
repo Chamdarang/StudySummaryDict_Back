@@ -4,9 +4,8 @@ import com.study.studydict.dto.BaseReturnDTO;
 import com.study.studydict.dto.DocDTO;
 import com.study.studydict.dto.DocListDTO;
 import com.study.studydict.model.Doc;
-import com.study.studydict.model.Info;
 import com.study.studydict.repository.DocRepository;
-import com.study.studydict.repository.InfoRepository;
+import com.study.studydict.util.MarkdownUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,19 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class DocService {
 
     private final DocRepository docRepository;
-    private final InfoRepository infoRepository;
+    private final MarkdownUtil markdownUtil;
 
-    public DocService(DocRepository docRepository,InfoRepository infoRepository){
+    public DocService(DocRepository docRepository, MarkdownUtil markdownUtil){
         this.docRepository=docRepository;
-        this.infoRepository=infoRepository;
+        this.markdownUtil = markdownUtil;
     }
     @Transactional(readOnly = true)
     public BaseReturnDTO getAllDocList(Pageable pageable){
@@ -56,7 +53,7 @@ public class DocService {
         if (docOptional.isPresent()){
             Doc doc=docOptional.get();
             if (isView){
-                doc.setContent(makeMarkDown(doc.getContent()));
+                doc.setContent(markdownUtil.makeMarkDown(doc.getContent()));
             }
             ret_data.put("doc",new DocDTO(doc));
         }else {
@@ -65,6 +62,7 @@ public class DocService {
         return new BaseReturnDTO("Success","",ret_data);
     }
     public BaseReturnDTO saveDoc(DocDTO docDTO){
+        HashMap<String,Object> ret_data=new HashMap<>();
         String message="New";
         Doc doc=new Doc();
         doc.setId(docDTO.id());
@@ -77,8 +75,10 @@ public class DocService {
                 message="Update";
             }
         }
-        docRepository.save(doc);
-        return new BaseReturnDTO("Success",message);
+
+        Long id= docRepository.save(doc).getId();
+        ret_data.put("id",id);
+        return new BaseReturnDTO("Success",message,ret_data);
     }
     public BaseReturnDTO deleteDoc(DocDTO docDTO){
         Doc doc=new Doc();
@@ -87,28 +87,5 @@ public class DocService {
         return new BaseReturnDTO("Success","");
     }
 
-    private String makeMarkDown(String contents){
 
-        Matcher matcher= Pattern.compile("[\\n]?\\[\\[([\\w가-힣]+[\\w가-힣 ]*)\\]\\]\\n").matcher(contents);
-        while (matcher.find()){
-            String tgt=matcher.group(1);
-            if (contents.contains("\n[[" + tgt + "]]\n")){
-                contents=contents.replace("\n[["+tgt+"]]\n",makeMDofInfo(tgt));
-            }else{
-                contents=contents.replace("[["+tgt+"]]\n",makeMDofInfo(tgt));
-            }
-
-        }
-        return contents;
-    }
-    private String makeMDofInfo(String name){
-        Info info= infoRepository.findByNameIgnoreCase(name);
-        if(info==null){
-            info=new Info();
-            info.setId((long)-1);
-            info.setName(name);
-            info.setSimpleInfo("-");
-        }
-        return "<div className=\"m-2 rounded-0 border\" key="+info.getId()+"><div className=\"fs-4 fw-bold mb-1\">"+info.getName()+"</div><div className=\"text-pre\">"+info.getSimpleInfo()+"</div></div>";
-    }
 }
