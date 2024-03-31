@@ -51,18 +51,18 @@ public class MarkdownUtil {
         }
         return content;
     }
-    private StringBuilder makeMDofIndent(StringBuilder content){
-        Matcher matcher= Pattern.compile("^(\\s+)",Pattern.MULTILINE).matcher(content);
+    private StringBuilder makeMDofIndent(StringBuilder content) {
+        Matcher matcher = Pattern.compile("^(\\s+)", Pattern.MULTILINE).matcher(content);
         while (matcher.find()) {
-            String replaceText="";
-            int[] targetIdx= {matcher.start(1),matcher.end(1)};
+            String replaceText = "";
+            int[] targetIdx = {matcher.start(1), matcher.end(1)};
             int spaces = matcher.group(1).length();
-            replaceText+="&emsp;".repeat(spaces/3);
-            spaces%=3;
-            replaceText+="&ensp;".repeat(spaces/2);
-            spaces%=2;
-            replaceText+="&nbsp;".repeat(spaces);
-            content.replace(targetIdx[0],targetIdx[1],replaceText);
+            replaceText += "&emsp;".repeat(spaces / 3);
+            spaces %= 3;
+            replaceText += "&ensp;".repeat(spaces / 2);
+            spaces %= 2;
+            replaceText += "&nbsp;".repeat(spaces);
+            content.replace(targetIdx[0], targetIdx[1], replaceText);
         }
         return content;
     }

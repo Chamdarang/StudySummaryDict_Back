@@ -5,6 +5,20 @@ spring:
     encoding:
       charset: utf-8
       enabled: true
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  profiles:
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
     url: jdbc:postgresql://localhost:5432/infodict
     username: postgres
@@ -17,12 +31,21 @@ spring:
     user:
       username: chamdarango
       password: ineastsea
-  # Hibernate ??
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
 server:
   port: 2230
+---
+spring:
+  config:
+    activate:
+      on-profile: server
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  security:
+    user:
+      username: ${SPRING_SECURITY_USERNAME}
+      password: ${SPRING_SECURITY_PASSWORD}
+server:
+  port: ${SPRING_SERVER_PORT}
