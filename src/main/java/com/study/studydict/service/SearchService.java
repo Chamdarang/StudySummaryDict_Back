@@ -48,7 +48,7 @@ public class SearchService {
     @Transactional(readOnly = true)
     public BaseReturnDTO getByName(String name,Pageable pageable){ //이름 검색
         HashMap<String,Object> ret_data=new HashMap<>();
-        Page<Info> infoList= infoRepository.findByNameContainingIgnoreCaseOrderByRecentUpdateDesc(name,pageable);
+        Page<Info> infoList= infoRepository.findByNameContainingIgnoreCaseOrSimpleInfoContainingIgnoreCaseOrderByRecentUpdateDesc(name,pageable);
         List<InfoDTO> infoListDTO= infoList.stream()
                 .map(info->{
                     List<Tag> tagList= tagRepository.findByInfoId(info.getId());
